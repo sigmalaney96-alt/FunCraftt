@@ -1,6 +1,13 @@
 {
-    "github": {
-        "enabled": false,
-        "silent": false
-    }
+  "github": {
+    "enabled": false,
+    "silent": false
+  },
+  "version": 2,
+  "routes": [
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/manifest.json", "dest": "/manifest.json" },
+    { "src": "/config.json", "dest": "/config.json" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
 }

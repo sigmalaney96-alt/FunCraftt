@@ -1,11 +1,11 @@
 {
   "version": 1,
   "defaultHost": "<from-proxy>",
-  "defaultProxy": "https://proxy.mcraft.fun",
+  "defaultProxy": "",
   "mapsProvider": "https://maps.mcraft.fun/",
   "skinTexturesProxy": "",
-  "peerJsServer": "",
-  "peerJsServerFallback": "https://p2p.mcraft.fun",
+  "peerJsServer": "https://0.peerjs.com",
+  "peerJsServerFallback": "https://0.peerjs.com",
   "promoteServers": [
     {
       "ip": "wss://play.mcraft.fun"
@@ -30,19 +30,17 @@
       "description": "Might be available soon, stay tuned!"
     }
   ],
-  "rightSideText": "A Minecraft client clone in the browser!",
+  "rightSideText": "FunGames.gg Edition",
   "splashText": "Mind the bugs and have fun!",
   "splashTextFallback": "Welcome!",
-  "pauseLinks": [
-    [
-      {
-        "type": "github"
-      },
-      {
-        "type": "discord"
-      }
-    ]
-  ],
+  "pauseLinks": [[
+    {
+      "type": "github"
+    },
+    {
+      "type": "discord"
+    }
+  ]],
   "defaultUsername": "mcrafter{0-9999}",
   "mobileButtons": [
     {

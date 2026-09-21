@@ -60,7 +60,6 @@ const MainMenuBase = ({
 
   const splashText = useMemo(() => {
     const cachedText = getCachedSplashText()
-
     const configSplashFromApp = appConfig?.splashText
     const isRemote = configSplashFromApp && isRemoteSplashText(configSplashFromApp)
     const sourceKey = isRemote ? configSplashFromApp : (configSplashFromApp || '')
@@ -97,7 +96,6 @@ const MainMenuBase = ({
   }, [appConfig?.splashText])
 
   if (!bottomRightLinks?.trim()) bottomRightLinks = undefined
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
   const linksParsed = bottomRightLinks?.split(/;|\n/g).map(l => {
     const parts = l.split(':')
     return [parts[0], parts.slice(1).join(':')]
@@ -123,7 +121,6 @@ const MainMenuBase = ({
   const connectToServerLongPress = useLongPress(
     () => {
       if (process.env.NODE_ENV === 'development') {
-        // Connect to <origin>:25565
         const origin = window.location.hostname
         const connectOptions: ConnectOptions = {
           server: `${origin}:25565`,
@@ -173,7 +170,6 @@ const MainMenuBase = ({
 
           <ButtonWithTooltip
             disabled={!mapsProvider}
-            // className={styles['maps-provider']}
             icon={pixelartIcons.map}
             initialTooltip={{ content: 'Explore maps to play from provider!', placement: 'top-start' }}
             onClick={() => mapsProvider && openURL(httpsRegex.test(mapsProvider) ? mapsProvider : 'https://' + mapsProvider, false)}
@@ -189,9 +185,7 @@ const MainMenuBase = ({
             }}
           />
         </div>
-        <Button
-          onClick={optionsAction}
-        >
+        <Button onClick={optionsAction}>
           Options
         </Button>
         <div className={styles['menu-row']}>
@@ -217,10 +211,10 @@ const MainMenuBase = ({
               clip: 'rect(1px, 1px, 1px, 1px)',
               whiteSpace: 'nowrap'
             }}>
-              Prismarine Web Client
+              FunGames.gg Edition
             </span>
 
-            V2 Presented by Sandexzx {versionStatus}
+            FunGames.gg Edition {versionStatus}
           </span>
         </div>
         <span className={styles['product-description']}>
@@ -228,16 +222,9 @@ const MainMenuBase = ({
             {linksParsed?.map(([name, link], i, arr) => {
               if (!link.startsWith('http')) link = `https://${link}`
               const finalLink = link
-              return <div style={{
-                color: 'lightgray',
-                fontSize: 8,
-              }}>
+              return <div style={{ color: 'lightgray', fontSize: 8 }} key={name}>
                 <a
-                  key={name}
-                  style={{
-                    whiteSpace: 'nowrap',
-                    cursor: 'pointer',
-                  }}
+                  style={{ whiteSpace: 'nowrap', cursor: 'pointer' }}
                   onClick={(e) => {
                     e.preventDefault()
                     openURL(finalLink, false)

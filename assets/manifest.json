@@ -1,6 +1,6 @@
 {
-    "name": "Minecraft Web Client",
-    "short_name": "Minecraft Web Client",
+    "name": "FunGames.gg Edition",
+    "short_name": "FunGames.gg",
     "scope": "./",
     "start_url": "./",
     "icons": [

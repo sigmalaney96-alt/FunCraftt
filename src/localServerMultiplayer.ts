@@ -5,6 +5,23 @@ import { resolveTimeout } from './utils'
 import { setLoadingScreenStatus } from './appStatus'
 import { miscUiState } from './globalState'
 
+const getPeerJsOptions = (hostOverride?: string) => {
+  const baseHost = hostOverride || miscUiState.appConfig?.peerJsServer || 'https://0.peerjs.com'
+  const isSecure = baseHost.startsWith('https://') || location.protocol === 'https:'
+  const parsed = parseUrl(baseHost)
+
+  return {
+    host: parsed.host || '0.peerjs.com',
+    port: parsed.port || (isSecure ? 443 : 80),
+    path: parsed.path || '/myapp',
+    secure: isSecure,
+    config: {
+      iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }]
+    },
+    ...parsed
+  }
+}
+
 class CustomDuplex extends Duplex {
   constructor (options, public writeAction) {
     super(options)
@@ -32,7 +49,6 @@ export const getJoinLink = () => {
   url.searchParams.set('peerVersion', localServer!.options.version)
   const host = (overridePeerJsServer ?? miscUiState.appConfig?.peerJsServer) ?? undefined
   if (host) {
-    // TODO! use miscUiState.appConfig.peerJsServer
     url.searchParams.set('server', host)
   }
   return url.toString()
@@ -55,14 +71,10 @@ export const openToWanAndCopyJoinLink = async (writeText: (text) => void, doCopy
     return 'Already opened to wan. Join link copied'
   }
   miscUiState.wanOpening = true
-  const host = (overridePeerJsServer ?? miscUiState.appConfig?.peerJsServer) || undefined
-  const params = host ? parseUrl(host) : undefined
-  const peer = new Peer({
-    debug: 3,
-    secure: true,
-    ...params
-  })
+  const host = (overridePeerJsServer ?? miscUiState.appConfig?.peerJsServer) || 'https://0.peerjs.com'
+  const peer = new Peer(getPeerJsOptions(host))
   peerInstance = peer
+
   peer.on('connection', (connection) => {
     console.log('connection')
     const serverDuplex = new CustomDuplex({}, async (data) => connection.send(data))
@@ -73,7 +85,6 @@ export const openToWanAndCopyJoinLink = async (writeText: (text) => void, doCopy
     connection.on('data', (data: any) => {
       serverDuplex.push(Buffer.from(data))
     })
-    // our side disconnect
     const endConnection = () => {
       console.log('connection.close')
       serverDuplex.end()
@@ -96,7 +107,7 @@ export const openToWanAndCopyJoinLink = async (writeText: (text) => void, doCopy
     connection.on('close', disconnected)
     connection.on('error', disconnected)
   })
-  const fallbackServer = miscUiState.appConfig?.peerJsServerFallback
+  const fallbackServer = miscUiState.appConfig?.peerJsServerFallback || 'https://0.peerjs.com'
   const hasFallback = fallbackServer && peer.options.host !== fallbackServer
   let hadErrorReported = false
   peer.on('error', (error) => {
@@ -134,7 +145,6 @@ export const openToWanAndCopyJoinLink = async (writeText: (text) => void, doCopy
       }
     }, 6000)
 
-    // fallback
     peer.on('error', async (error) => {
       if (!peer.open) {
         if (hasFallback) {
@@ -155,7 +165,6 @@ export const openToWanAndCopyJoinLink = async (writeText: (text) => void, doCopy
 }
 
 const parseUrl = (url: string) => {
-  // peerJS does this internally for some reason: const url = new URL(`${protocol}://${host}:${port}${path}${key}/${method}`)
   if (!url.startsWith('http')) url = `${location.protocol}//${url}`
   const urlObj = new URL(url)
   const key = urlObj.searchParams.get('key')
@@ -181,14 +190,8 @@ export type ConnectPeerOptions = {
 
 export const connectToPeer = async (peerId: string, options: ConnectPeerOptions = {}) => {
   setLoadingScreenStatus('Connecting to peer server')
-  // todo destroy connection on error
-  // TODO! use miscUiState.appConfig.peerJsServer
-  const host = options.server
-  const params = host ? parseUrl(host) : undefined
-  const peer = new Peer({
-    debug: 3,
-    ...params
-  })
+  const host = options.server || miscUiState.appConfig?.peerJsServer || 'https://0.peerjs.com'
+  const peer = new Peer(getPeerJsOptions(host))
   await resolveTimeout(new Promise(resolve => {
     peer.once('open', resolve)
   }))
@@ -206,8 +209,6 @@ export const connectToPeer = async (peerId: string, options: ConnectPeerOptions 
   }))
 
   const clientDuplex = new CustomDuplex({}, (data) => {
-    // todo debug until play state
-    // console.debug('sending', data.toString())
     void connection.send(data)
   })
   connection.on('data', (data: any) => {
@@ -217,8 +218,6 @@ export const connectToPeer = async (peerId: string, options: ConnectPeerOptions 
   connection.on('close', () => {
     console.log('connection closed')
     clientDuplex.end()
-    // bot._client.end()
-    // bot.end()
     bot.emit('end', 'Disconnected.')
   })
   connection.on('error', (error) => {
