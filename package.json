@@ -13,7 +13,7 @@
     "build-single-file": "SINGLE_FILE_BUILD=true rsbuild build",
     "prepare-project": "tsx scripts/genShims.ts && tsx scripts/makeOptimizedMcData.mjs && tsx scripts/genLargeDataAliases.ts",
     "check-build": "pnpm prepare-project && tsc && pnpm build",
-    "vercel-build": "pnpm build",
+    "vercel-build": "pnpm prepare-project && pnpm build",
     "test:cypress": "cypress run",
     "test:benchmark": "PERFORMANCE_TEST=true cypress run",
     "test:cypress:open": "cypress open",

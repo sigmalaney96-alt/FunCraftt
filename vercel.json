@@ -1,9 +1,7 @@
 {
-  "github": {
-    "enabled": false,
-    "silent": false
-  },
   "version": 2,
+  "buildCommand": "pnpm vercel-build",
+  "outputDirectory": "dist",
   "routes": [
     { "src": "/assets/(.*)", "dest": "/assets/$1" },
     { "src": "/manifest.json", "dest": "/manifest.json" },
